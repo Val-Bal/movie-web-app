@@ -1,5 +1,10 @@
-const express = require('express');
+const express = require('express'),
+morgan = require('morgan');
+
 const app = express();
+
+app.use(express.static('public'));
+app.use(morgan('common'));
 
 let topMovies = [
   {
@@ -57,6 +62,11 @@ app.get('/movies', (req, res) => {
   res.json(topMovies);
 });
 
+// error-handling
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Oh, oh, something went wrong!');
+  });
 
 // listen for requests
 app.listen(8080, () => {
