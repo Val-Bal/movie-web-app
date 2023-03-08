@@ -49,7 +49,7 @@ let topMovies = [
   }
 ];
 
-// GET requests
+// GET requests documentation
 app.get('/', (req, res) => {
   res.send('Welcome to Indiflix!');
 });
@@ -61,6 +61,11 @@ app.get('/documentation', (req, res) => {
 app.get('/movies', (req, res) => {
   res.json(topMovies);
 });
+
+// GET requests
+app.get('index.html', (req, res) => {
+    res.sendFile('index.html', { root: __dirname });
+  });
 
 // error-handling
 app.use((err, req, res, next) => {
