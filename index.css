@@ -1,0 +1,21 @@
+/* endpoint documentation table */
+.table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .table th {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+    background-color: lightgray;
+  }
+  
+  .table td {
+    border: 1px solid black;
+    padding: 8px;
+  }
+  
+  .table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
