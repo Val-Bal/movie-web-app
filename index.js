@@ -163,9 +163,9 @@ app.get('/movies', (req, res) => {
 })
 
 // READ
-app.get('/movie:title', (req, res) => {
+app.get('/movie:/title', (req, res) => {
   const { title } = req.params;
-  const movie = movies.find( movie => movie.title === title );
+  const movie = movies.find( movie => movie.Title === title );
 
   if (movie) {
     return res.status(200).json(movie);
@@ -178,7 +178,7 @@ app.get('/movie:title', (req, res) => {
 // READ
 app.get('/movies/genre/:genreName', (req, res) => {
   const { genreName } = req.params;
-  const genre = movies.find( movie => movies.Genre === genreName ).Genre;
+  const genre = movies.find( movie => movie.Genre === genreName ).Genre;
 
   if (genre) {
     return res.status(200).json(genre);
@@ -282,10 +282,6 @@ app.get('/', (req, res) => {
 
 app.get('/documentation', (req, res) => {                  
   res.sendFile('public/documentation.html', { root: __dirname });
-});
-
-app.get('/movies', (req, res) => {
-  res.json(movies);
 });
 
 // GET requests index --> does not work yet
