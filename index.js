@@ -163,7 +163,7 @@ app.get('/movies', (req, res) => {
 })
 
 // READ
-app.get('/movie:/title', (req, res) => {
+app.get('/movies:/title', (req, res) => {
   const { title } = req.params;
   const movie = movies.find( movie => movie.Title === title );
 
@@ -246,7 +246,7 @@ app.put('/users/:id', (req, res) => {
 
 
  ///////       DELETE = delete      ///////
-app.post('/users/:id/:movieTitle', (req, res) => {
+app.delete('/users/:id/:movieTitle', (req, res) => {
   const { id, movieTitle } = req.params;
 
   let user = users.find( user => user.id == id );
@@ -261,13 +261,13 @@ app.post('/users/:id/:movieTitle', (req, res) => {
 
 
 // DELETE 
-app.post('/users/:id', (req, res) => {
+app.delete('/users/:id', (req, res) => {
   const { id } = req.params;
 
   let user = users.find( user => user.id == id );
 
   if (user) {
-    users = user.filter( user => user.id != id )
+    users = users.filter( user => user.id != id )
     res.status(200).send(`user ${id} has been deleted`);
   } else {
     res.status(400).send('no such user')
