@@ -180,7 +180,6 @@ app.get('/movies/:title', (req, res) => {
   }
 
 })
-*/
 
 
 
