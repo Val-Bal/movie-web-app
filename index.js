@@ -384,7 +384,7 @@ app.post("/users", (req, res) => {
   });
 });
 
-// UPDATE user info
+// UPDATE user info --> ok
 app.put("/users/:Username", (req, res) => {
   Users.findOneAndUpdate(
    { Username: req.params.Username },
@@ -408,24 +408,43 @@ app.put("/users/:Username", (req, res) => {
   );
 });
 
-// UPDATE favourite movie 
+//  movie from users favorite movies
 app.post("/users/:Username/movies/:MoviesID", (req, res) => {
-  Users.findOneAndUpdate(
-      { Username: req.params.Username },
-      {
-          $push: { FavoriteMovies: req.params.MoviesID }
-      },
-      { new: true }, 
-      (err, updatedUser) => {
-          if (err) {
-              console.error(err);
-              res.status(500).send("Error: " + err);
+  Users.findOneAndUpdate ({ Username: req.params.Username }, {
+    $push: { FavoriteMovies: req.params.MoviesID }
+})
+      .then((user) => {
+          if (!user) {
+              res.status(400).send("Not able to add favorite movie");
           } else {
-              res.status(200).json(updatedUser);
+              res.status(200).send("Favorite movie was added.");
           }
-      }
-  );
+      })
+      .catch((err) => {
+          console.error(err);
+          res.status(500).send("Error: " + err);
+  });
 });
+
+
+// DELETE movie from users favorite movies
+app.delete("/users/:Username/movies/:MoviesID", (req, res) => {
+  Users.findOneAndUpdate ({ Username: req.params.Username }, {
+    $pull: { FavoriteMovies: req.params.MoviesID }
+})
+      .then((user) => {
+          if (!user) {
+              res.status(400).send(req.params.MoviesID + " was not found");
+          } else {
+              res.status(200).send("Favorite movie was deleted.");
+          }
+      })
+      .catch((err) => {
+          console.error(err);
+          res.status(500).send("Error: " + err);
+  });
+});
+
 
 // DELETE users
 app.delete("/users/:Username", (req, res) => {
@@ -442,27 +461,6 @@ app.delete("/users/:Username", (req, res) => {
           res.status(500).send("Error: " + err);
       });
 });
-
-
-// DELETE movie from users favorite movies
-app.delete("/users/:Username/movies/:MoviesID", (req, res) => {
-  Users.findOneAndRemove ({ Username: req.params.Username }, {
-    $pull: { FavoriteMovies: req.params.MoviesID }
-})
-      .then((user) => {
-          if (!user) {
-              res.status(400).send(req.params.Username + " was not found");
-          } else {
-              res.status(200).send(req.params.Username + " was deleted.");
-          }
-      })
-      .catch((err) => {
-          console.error(err);
-          res.status(500).send("Error: " + err);
-  });
-});
-
-
 
 
 
