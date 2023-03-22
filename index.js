@@ -17,7 +17,7 @@ morgan = require('morgan'),
 app.use(express.static('public'));
 app.use(morgan('common'));
 
-/*
+/* OLD DATA
 let users = [
 {
   id: 1,
@@ -190,8 +190,6 @@ app.get('/movies/:title', (req, res) => {
 
 })
 
-
-
 // READ
 app.get('/movies/genre/:genreName', (req, res) => {
   const { genreName } = req.params;
@@ -294,7 +292,21 @@ app.delete('/users/:id', (req, res) => {
 */
 
 // REQUEST with MONGODB
-// 1.READ (GET all movies)
+
+// READ (GET all users) --> OK
+app.get("/users", function(req, res) {
+  Users.find()
+  .then(function (users) {
+      res.status(201).json(users);
+  })
+  .catch(function (err) {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+  });
+});
+
+
+// READ (GET all movies) --> OK
 app.get("/movies", (req, res) => {
   Movies.find()
   .then((movies) => {
@@ -306,12 +318,24 @@ app.get("/movies", (req, res) => {
   });
 });
 
+//READ (GET movie by title) --> 
+app.get("/movies/:Title", (req, res) => {
+  Movies.findOne({ Title: req.params.Title })
+  .then((movie) => {
+       res.json(movie);
+  })
+  .catch((err) => {
+   console.error(err);
+   res.status(500).send("Error: " + err);
+  });
+});
 
-// 3.READ (GET genre by name)
-app.get("/genre/:Name", (req, res) => {
-  Genres.findOne({ Name: req.params.Name })
-  .then((genre) => {
-      res.json(genre.Description);
+
+// READ (GET genre by name)
+app.get("/movies/genre/:Name", (req, res) => {
+  Movies.findOne({ 'Genre.Name': req.params.Name })
+  .then((movie) => {
+      res.json(movie.Genre);
   })
   .catch((err) => {
       console.error(err);
@@ -319,9 +343,9 @@ app.get("/genre/:Name", (req, res) => {
   });
 });
 
- // 4.READ (GET director by name)
- app.get("/directors/:Name", (req, res) => {
-  Directors.findOne({ Name: req.params.Name })
+ // READ (GET director by name)
+ app.get("/movies/directors/:Name", (req, res) => {
+  Movies.findOne({ 'Director.Name': req.params.Name })
   .then((director) => {
       res.json(director);
   })
@@ -332,7 +356,7 @@ app.get("/genre/:Name", (req, res) => {
 });
 
 
-// 5.CREATE a new user
+// CREATE a new user
 app.post("/users", (req, res) => {
   Users.findOne({ Username: req.body.Username })
   .then((user) => {
@@ -360,7 +384,7 @@ app.post("/users", (req, res) => {
   });
 });
 
-// 6.UPDATE user info
+// UPDATE user info
 app.put("/users/:Username", (req, res) => {
   Users.findOneAndUpdate(
    { Username: req.params.Username },
@@ -384,8 +408,8 @@ app.put("/users/:Username", (req, res) => {
   );
 });
 
-// 7.UPDATE favourite movie 
-app.post("/users/:Username/movies/:Title", (req, res) => {
+// UPDATE favourite movie 
+app.post("/users/:Username/movies/:MoviesID", (req, res) => {
   Users.findOneAndUpdate(
       { Username: req.params.Username },
       {
@@ -403,7 +427,7 @@ app.post("/users/:Username/movies/:Title", (req, res) => {
   );
 });
 
-// 8.DELETE movies from users favorite movies
+// DELETE users
 app.delete("/users/:Username", (req, res) => {
   Users.findOneAndRemove ({ Username: req.params.Username })
       .then((user) => {
@@ -419,9 +443,12 @@ app.delete("/users/:Username", (req, res) => {
       });
 });
 
-// 9.DELETE user 
-app.delete("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
-  Users.findOneAndRemove ({ Username: req.params.Username })
+
+// DELETE movie from users favorite movies
+app.delete("/users/:Username/movies/:MoviesID", (req, res) => {
+  Users.findOneAndRemove ({ Username: req.params.Username }, {
+    $pull: { FavoriteMovies: req.params.MoviesID }
+})
       .then((user) => {
           if (!user) {
               res.status(400).send(req.params.Username + " was not found");
@@ -436,30 +463,7 @@ app.delete("/users/:Username", passport.authenticate("jwt", { session: false }),
 });
 
 
-//READ (GET movie by title)
-app.get("/movies/:Title", (req, res) => {
-  Movies.findOne({ Title: req.params.Title })
-  .then((movies) => {
-       res.json(movie);
-  })
-  .catch((err) => {
-   console.error(err);
-   res.status(500).send("Error: " + err);
-  });
-});
 
-
-// READ (GET all users)
-app.get("/users", function(req, res) {
-  Users.find()
-  .then(function (users) {
-      res.status(201).json(users);
-  })
-  .catch(function (err) {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-  });
-});
 
 
 // GET requests documentation
