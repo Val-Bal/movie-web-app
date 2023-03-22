@@ -17,6 +17,7 @@ morgan = require('morgan'),
 app.use(express.static('public'));
 app.use(morgan('common'));
 
+/*
 let users = [
 {
   id: 1,
@@ -162,7 +163,10 @@ let movies = [
       "Featured": false
     }
   ];
+*/
 
+/*
+/// OLD REQUESTS
 ///////       READ = get      ///////
 app.get('/movies', (req, res) => {
   res.status(200).json(movies);
@@ -287,9 +291,9 @@ app.delete('/users/:id', (req, res) => {
   }
 })
 
+*/
 
-
-/* new code
+// REQUEST with MONGODB
 // 1.READ (GET all movies)
 app.get("/movies", (req, res) => {
   Movies.find()
@@ -457,7 +461,7 @@ app.get("/users", function(req, res) {
   });
 });
 
-*/
+
 // GET requests documentation
 app.get('/', (req, res) => {
   res.send('Welcome to Indiflix!');
