@@ -168,6 +168,11 @@ app.get('/movies', (req, res) => {
   res.status(200).json(movies);
 })
 
+// READ 
+app.get('/users', (req, res) => {
+  res.status(200).json(users);
+})
+
 // READ
 app.get('/movies/:title', (req, res) => {
   const { title } = req.params;
@@ -199,7 +204,7 @@ app.get('/movies/genre/:genreName', (req, res) => {
 // READ 
 app.get('/movies/directors/:directorName', (req, res) => {
   const { directorName } = req.params;
-  const director = movies.find( movie => movies.Director.Name === directorName ).Director;
+  const director = movies.find( movie => movie.Director.Name === directorName ).Director;
 
   if (director) {
     return res.status(200).json(director);
@@ -284,7 +289,7 @@ app.delete('/users/:id', (req, res) => {
 
 
 
-/*
+/* new code
 // 1.READ (GET all movies)
 app.get("/movies", (req, res) => {
   Movies.find()
