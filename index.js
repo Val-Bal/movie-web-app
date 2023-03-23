@@ -3,10 +3,10 @@ morgan = require('morgan'),
  app = express(),
  bodyParser = require('body-parser'),
  uuid = require ('uuid');
- mongoose = require('mongoose');
- Models = require('./models.js');
- Movies = Models.Movie;
- Users = Models.User;
+const mongoose = require('mongoose');
+const Models = require('./models.js');
+const Movies = Models.Movie;
+const Users = Models.User;
 
 
  app.use(bodyParser.json());
@@ -383,8 +383,8 @@ app.post("/users", (req, res) => {
       res.status(500).send("Error: " + err);
   });
 });
-
-// UPDATE user info --> ok
+/*
+// UPDATE user info with callback --> no
 app.put("/users/:Username", (req, res) => {
   Users.findOneAndUpdate(
    { Username: req.params.Username },
@@ -407,8 +407,33 @@ app.put("/users/:Username", (req, res) => {
    }
   );
 });
+*/ 
 
-//  movie from users favorite movies
+// UPDATE user info --> 
+app.put("/users/:Username", (req, res) => {
+  Users.findOneAndUpdate(
+    { Username: req.params.Username },
+    {
+        $set: {
+            Username: req.body.Username,
+            Password: req.body.Password,
+            Email: req.body.Email,
+            Birth: req.body.Birth,
+        },
+    },
+    { new: true }
+)
+    .then((updatedUser) => {
+        res.json(updatedUser);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+    });
+});
+
+// CREATE movie from users favorite movies 
+// why Psot when update?
 app.post("/users/:Username/movies/:MoviesID", (req, res) => {
   Users.findOneAndUpdate ({ Username: req.params.Username }, {
     $push: { FavoriteMovies: req.params.MoviesID }
