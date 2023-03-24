@@ -9,7 +9,19 @@ const Movies = Models.Movie;
 const Users = Models.User;
 
 
- app.use(bodyParser.json());
+ //app.use(bodyParser.json());
+
+ ///////////////////
+app.use(bodyParser.urlencoded({ extended: true }));
+// where is the above code?????
+
+let auth = require('./auth')(app);
+
+
+
+const passport = require('passport');
+require('./passport');
+
 
  mongoose.connect('mongodb://localhost:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -294,7 +306,7 @@ app.delete('/users/:id', (req, res) => {
 // REQUEST with MONGODB
 
 // READ (GET all users) --> OK
-app.get("/users", function(req, res) {
+app.get("/users", passport.authenticate('jwt', { session: false }), function(req, res) {
   Users.find()
   .then(function (users) {
       res.status(201).json(users);
@@ -307,19 +319,31 @@ app.get("/users", function(req, res) {
 
 
 // READ (GET all movies) --> OK
-app.get("/movies", (req, res) => {
+
+// app.get("/movies", (req, res) => {
+//   Movies.find()
+//   .then((movies) => {
+//       res.status(201).json(movies);   
+// })
+//   .catch((err) => {
+//       console.error(err);
+//       res.status(500).send("Error: " + err);
+//   });
+// });
+
+app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
-  .then((movies) => {
-      res.status(201).json(movies);   
-})
-  .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-  });
+    .then((movies) => {
+      res.status(201).json(movies);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    });
 });
 
 //READ (GET movie by title) --> 
-app.get("/movies/:Title", (req, res) => {
+app.get("/movies/:Title", passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ Title: req.params.Title })
   .then((movie) => {
        res.json(movie);
@@ -332,7 +356,7 @@ app.get("/movies/:Title", (req, res) => {
 
 
 // READ (GET genre by name)
-app.get("/movies/genre/:Name", (req, res) => {
+app.get("/movies/genre/:Name", passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ 'Genre.Name': req.params.Name })
   .then((movie) => {
       res.json(movie.Genre);
@@ -344,7 +368,7 @@ app.get("/movies/genre/:Name", (req, res) => {
 });
 
  // READ (GET director by name)
- app.get("/movies/directors/:Name", (req, res) => {
+ app.get("/movies/directors/:Name", passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ 'Director.Name': req.params.Name })
   .then((director) => {
       res.json(director);
@@ -410,7 +434,7 @@ app.put("/users/:Username", (req, res) => {
 */ 
 
 // UPDATE user info --> 
-app.put("/users/:Username", (req, res) => {
+app.put("/users/:Username", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndUpdate(
     { Username: req.params.Username },
     {
@@ -434,7 +458,7 @@ app.put("/users/:Username", (req, res) => {
 
 // CREATE movie from users favorite movies 
 // why Psot when update?
-app.post("/users/:Username/movies/:MoviesID", (req, res) => {
+app.post("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndUpdate ({ Username: req.params.Username }, {
     $push: { FavoriteMovies: req.params.MoviesID }
 })
@@ -453,7 +477,7 @@ app.post("/users/:Username/movies/:MoviesID", (req, res) => {
 
 
 // DELETE movie from users favorite movies
-app.delete("/users/:Username/movies/:MoviesID", (req, res) => {
+app.delete("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndUpdate ({ Username: req.params.Username }, {
     $pull: { FavoriteMovies: req.params.MoviesID }
 })
@@ -472,7 +496,7 @@ app.delete("/users/:Username/movies/:MoviesID", (req, res) => {
 
 
 // DELETE users
-app.delete("/users/:Username", (req, res) => {
+app.delete("/users/:Username", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndRemove ({ Username: req.params.Username })
       .then((user) => {
           if (!user) {
