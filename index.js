@@ -306,7 +306,7 @@ app.delete('/users/:id', (req, res) => {
 // REQUEST with MONGODB
 
 // READ (GET all users) --> OK
-app.get("/users", passport.authenticate('jwt', { session: false }), function(req, res) {
+app.get("/users", /*passport.authenticate('jwt', { session: false }), */function(req, res) {
   Users.find()
   .then(function (users) {
       res.status(201).json(users);
