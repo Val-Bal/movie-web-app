@@ -9,7 +9,7 @@ const Movies = Models.Movie;
 const Users = Models.User;
 
 
- //app.use(bodyParser.json());
+ app.use(bodyParser.json());
 
  ///////////////////
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -306,7 +306,7 @@ app.delete('/users/:id', (req, res) => {
 // REQUEST with MONGODB
 
 // READ (GET all users) --> OK
-app.get("/users", /*passport.authenticate('jwt', { session: false }), */function(req, res) {
+app.get("/users", passport.authenticate('jwt', { session: false }), function(req, res) {
   Users.find()
   .then(function (users) {
       res.status(201).json(users);
@@ -381,7 +381,7 @@ app.get("/movies/genre/:Name", passport.authenticate('jwt', { session: false }),
 
 
 // CREATE a new user
-app.post("/users", (req, res) => {
+app.post("/users",  passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOne({ Username: req.body.Username })
   .then((user) => {
       if(user) {
