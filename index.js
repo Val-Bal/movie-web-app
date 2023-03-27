@@ -32,7 +32,7 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
-mongoose.connect('mongodb://localhost:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(express.static('public'));
 app.use(morgan('common'));
@@ -336,7 +336,7 @@ app.put("/users/:Username", passport.authenticate('jwt', { session: false }), (r
 });
 
 // CREATE movie from users favorite movies 
-// why Psot when update?
+// why Post when update?
 app.post("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndUpdate ({ Username: req.params.Username }, {
     $push: { FavoriteMovies: req.params.MoviesID }
