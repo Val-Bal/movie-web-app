@@ -37,131 +37,6 @@ mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnified
 app.use(express.static('public'));
 app.use(morgan('common'));
 
-/*
-/// OLD REQUESTS
-///////       READ = get      ///////
-app.get('/movies', (req, res) => {
-  res.status(200).json(movies);
-})
-
-// READ 
-app.get('/users', (req, res) => {
-  res.status(200).json(users);
-})
-
-// READ
-app.get('/movies/:title', (req, res) => {
-  const { title } = req.params;
-  const movie = movies.find( movie => movie.Title === title );
-
-  if (movie) {
-    return res.status(200).json(movie);
-  } else {
-    res.status(400).send('no such movie')
-  }
-
-})
-
-// READ
-app.get('/movies/genre/:genreName', (req, res) => {
-  const { genreName } = req.params;
-  const genre = movies.find( movie => movie.Genre === genreName ).Genre;
-
-  if (genre) {
-    return res.status(200).json(genre);
-  } else {
-    res.status(400).send('no such genre')
-  }
-
-})
-
-// READ 
-app.get('/movies/directors/:directorName', (req, res) => {
-  const { directorName } = req.params;
-  const director = movies.find( movie => movie.Director.Name === directorName ).Director;
-
-  if (director) {
-    return res.status(200).json(director);
-  } else {
-    res.status(400).send('no such director')
-  }
-
-})
-
-///////       CREATE = post      ///////
-// CREATE 
-app.post('/users', (req, res) => {
-  const newUser = req.body;
-
-  if (newUser.name) {
-    newUser.id = uuid.v4();
-    users.push(newUser);
-    res.status(201).json(newUser);
-  } else {
-    res.status(400).send('users need names')
-  }
-})
-
-// CREATE 
-app.post('/users/:id/:movieTitle', (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find( user => user.id == id );
-
-  if (user) {
-    user.favoriteMovies.push(movieTitle);
-    res.status(200).send(`${movieTitle} has been added to user ${id}'s array`);
-  } else {
-    res.status(400).send('no such movie')
-  }
-})
-
- ///////       UPDATE = put      ///////
-app.put('/users/:id', (req, res) => {
-  const { id } = req.params;
-  const updatedUser = req.body;
-
-  let user = users.find( user => user.id == id );
-
-  if (user) {
-    user.name = updatedUser.name;
-    res.status(200).json(user);
-  } else {
-    res.status(400).send('user not found')
-  }
-})
-
-
- ///////       DELETE = delete      ///////
-app.delete('/users/:id/:movieTitle', (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find( user => user.id == id );
-
-  if (user) {
-    user.favoriteMovies = user.favoriteMovies.filter( title => title !== movieTitle )
-    res.status(200).send(`${movieTitle} has been removed from user ${id}'s array`);
-  } else {
-    res.status(400).send('no such movie')
-  }
-})
-
-
-// DELETE 
-app.delete('/users/:id', (req, res) => {
-  const { id } = req.params;
-
-  let user = users.find( user => user.id == id );
-
-  if (user) {
-    users = users.filter( user => user.id != id )
-    res.status(200).send(`user ${id} has been deleted`);
-  } else {
-    res.status(400).send('no such user')
-  }
-})
-
-*/
 
 // REQUEST with MONGODB
 
@@ -176,20 +51,6 @@ app.get("/users", passport.authenticate('jwt', { session: false }), function(req
       res.status(500).send("Error: " + err);
   });
 });
-
-
-// READ (GET all movies) --> OK
-
-// app.get("/movies", (req, res) => {
-//   Movies.find()
-//   .then((movies) => {
-//       res.status(201).json(movies);   
-// })
-//   .catch((err) => {
-//       console.error(err);
-//       res.status(500).send("Error: " + err);
-//   });
-// });
 
 app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
@@ -214,7 +75,6 @@ app.get("/movies/:Title", passport.authenticate('jwt', { session: false }), (req
   });
 });
 
-
 // READ (GET genre by name)
 app.get("/movies/genre/:Name", passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ 'Genre.Name': req.params.Name })
@@ -238,7 +98,6 @@ app.get("/movies/genre/:Name", passport.authenticate('jwt', { session: false }),
       res.status(500).send("Error: " + err);
   });
 });
-
 
 // CREATE a new user
 app.post("/users", 
@@ -286,31 +145,6 @@ app.post("/users",
       res.status(500).send("Error: " + err);
   });
 });
-/*
-// UPDATE user info with callback --> no
-app.put("/users/:Username", (req, res) => {
-  Users.findOneAndUpdate(
-   { Username: req.params.Username },
-   {
-       $set: {
-           Username: req.body.Username,
-           Password: req.body.Password,
-           Email: req.body.Email,
-           Birth: req.body.Birth,
-       },
-   },
-   { new: true }, 
-   (err, updatedUser) => {
-       if (err) {
-           console.error(err);
-           res.status(500).send("Error: " + err);
-       } else {
-           res.json(updatedUser);
-       }
-   }
-  );
-});
-*/ 
 
 // UPDATE user info --> 
 app.put("/users/:Username", passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -354,7 +188,6 @@ app.post("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { ses
   });
 });
 
-
 // DELETE movie from users favorite movies
 app.delete("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndUpdate ({ Username: req.params.Username }, {
@@ -373,7 +206,6 @@ app.delete("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { s
   });
 });
 
-
 // DELETE users
 app.delete("/users/:Username", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndRemove ({ Username: req.params.Username })
@@ -389,8 +221,6 @@ app.delete("/users/:Username", passport.authenticate('jwt', { session: false }),
           res.status(500).send("Error: " + err);
       });
 });
-
-
 
 // GET requests documentation
 app.get('/', (req, res) => {
