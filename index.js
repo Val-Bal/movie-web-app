@@ -52,7 +52,7 @@ app.get("/users", passport.authenticate('jwt', { session: false }), function(req
   });
 });
 
-app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/movies', (req, res) => {
   Movies.find()
     .then((movies) => {
       res.status(201).json(movies);
@@ -153,7 +153,7 @@ app.put("/users/:Username", passport.authenticate('jwt', { session: false }), (r
     {
         $set: {
             Username: req.body.Username,
-            Password: req.body.Password,
+            Password: hashedPassword,
             Email: req.body.Email,
             Birth: req.body.Birth,
         },
