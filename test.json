@@ -1,0 +1,174 @@
+
+//"READ" queries
+//One to read all the movies from the “movies” collection that match a certain name
+
+db.movies.find({"Title": "The Worst Person in the World"});
+//One to read all the movies in the “movies” collection that have a certain genre
+db.movies.find({"Genre.Name": "Drama"});
+//One to read all the documents that contain both a certain genre AND a certain director
+db.movies.find({"Genre.Name": "Drama","Director.Name": "Xavier Dolan" });
+
+////"UPDATE" queries
+//One to update the description of a particular movie
+db.movies.updateOne({_id: ObjectId("64186d30c6b263bdc068b62c")},{$set: {Description: "Matthias & Maxime is a 2019 Canadian drama film written, directed, and co-edited by Xavier Dolan. The movie follows two childhood friends whose relationship is tested when they share a kiss while filming a student project."}} );
+
+//One to update the bio of a certain director of multiple movies
+db.movies.updateMany({"Director.Name": "Quentin Tarantino"}, {$set: {"Director.Bio": "Quentin Tarantino is an American filmmaker, screenwriter, and actor, born on March 27, 1963, in Knoxville, Tennessee. He began his career as an independent filmmaker in the 1990s, writing and directing movies such as Reservoir Dogs, Pulp Fiction, and Kill Bill. Tarantino is known for his distinctive style, which often includes nonlinear storylines, sharp dialogue, and graphic violence." }} );
+
+
+//One to add a certain movie to a particular user’s list of favorites
+db.users.updateOne(
+{ Username: "TroyeS" },
+{ $push: { FavoriteMovies: ObjectId("64186d30c6b263bdc068b62c") } }
+);
+
+///Finally, write a "DELETE" query to delete a certain user, by username.
+
+db.users.deleteOne(
+{ Username: "JohnDoe" }
+);
+
+
+mongoexport -d cfDB -c movies -o movies.json;
+
+mongoexport -d cfDB -c users -o users.json
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var user5 = {
+    Username: "Maxime",
+    Password: "M@x1mUs",
+    Email: "maxime@gmail.com",
+    Birthday: new Date("1980-03-18"),
+    FavouriteMovies:[{"$oid":"64187045c6b263bdc068b62f"},{"$oid":"6418719dc6b263bdc068b630"}]
+     };
+
+
+     cfDB> db.users.find();
+
+
+// update a specitific thing 
+  db.users.updateOne(
+  { Username: "TroyeS" },
+  { $push: { FavoriteMovies: { $each: [ ObjectId("64186c3ac6b263bdc068b62a"), ObjectId("64186d21c6b263bdc068b62b") ] } } }
+);
+
+db.users.updateOne(
+{ Username: "Ian84" },
+{ $push: { FavoriteMovies: { $each: [ ObjectId("64186b7dc6b263bdc068b628"), ObjectId("64186b7dc6b263bdc068b627"), ObjectId("6418752fc6b263bdc068b631") ] } } }
+);
+
+db.users.updateOne(
+{ Username: "IaTroyeSn84" },
+{ $push: { FavoriteMovies: { $each: [ ObjectId("6418753ec6b263bdc068b632"), ObjectId("6418752fc6b263bdc068b631"), ObjectId("64186e48c6b263bdc068b62e") ] } } }
+);
+
+db.users.updateOne(
+{ Username: "AugustineJ" },
+{ $push: { FavoriteMovies: { $each: [ ObjectId("64187045c6b263bdc068b62f"), ObjectId("64186d47c6b263bdc068b62d"), ObjectId("64186e48c6b263bdc068b62e") ] } } }
+);
+
+db.users.updateOne(
+{ Username: "Maxime" },
+{ $push: { FavoriteMovies: { $each: [ ObjectId("64186d47c6b263bdc068b62d"), ObjectId("64186b7dc6b263bdc068b628") ] } } }
+);
+
+
+///
+{
+    _id: ObjectId("6418a430c6b263bdc068b639"),
+    Username: 'Maxime',
+    Password: 'M@x1mUs',
+    Email: 'maxime@gmail.com',
+    Birthday: ISODate("1980-03-18T00:00:00.000Z"),
+    FavouriteMovies: [
+      { '$oid': '64187045c6b263bdc068b62f' },
+      { '$oid': '6418719dc6b263bdc068b630' }
+    ]
+  }
+]
+
+// how to add a user
+var user7 = {
+    Username: "Maxime",
+    Password: "M@x1mUs",
+    Email: "maxime@gmail.com",
+    Birthday: new Date("1980-03-18")
+     };
+     db.users.insertOne(user7);
+
+
+// to delete user
+
+db.users.deleteOne( { "_id" : ObjectId("6418a430c6b263bdc068b639") } );
+
+
+// List of all the users
+[
+  {
+    _id: ObjectId("64187855c6b263bdc068b633"),
+    Username: 'Br4no',
+    Password: 'hdjfDJu!4D',
+    Email: 'brunoBr4no@gmail.com',
+    Birthday: ISODate("1967-01-01T00:00:00.000Z")
+  },
+  {
+    _id: ObjectId("64187942c6b263bdc068b634"),
+    Username: 'JohnDoe',
+    Password: 'p@ssw0rd',
+    Email: 'johndoe@gmail.com',
+    Birthday: ISODate("1985-11-02T00:00:00.000Z")
+  },
+  {
+    _id: ObjectId("64187950c6b263bdc068b635"),
+    Username: 'Ian84',
+    Password: 'fKj#23Lm',
+    Email: 'Ian84@hotmail.com',
+    Birthday: ISODate("1990-05-14T00:00:00.000Z")
+  },
+  {
+    _id: ObjectId("6418795ec6b263bdc068b636"),
+    Username: 'TroyeS',
+    Password: 'L1s@p@ss',
+    Email: 'royeS@yahoo.com',
+    Birthday: ISODate("1998-07-23T00:00:00.000Z")
+  },
+  {
+    _id: ObjectId("6418799cc6b263bdc068b638"),
+    Username: 'AugustineJ',
+    Password: 'a@g@j123',
+    Email: 'augustinej@gmail.com',
+    Birthday: ISODate("1995-09-10T00:00:00.000Z")
+  },
+  {
+    _id: ObjectId("6418a430c6b263bdc068b639"),
+    Username: 'Maxime',
+    Password: 'M@x1mUs',
+    Email: 'maxime@gmail.com',
+    Birthday: ISODate("1980-03-18T00:00:00.000Z"),
+    FavouriteMovies: [
+      { '$oid': '64187045c6b263bdc068b62f' },
+      { '$oid': '6418719dc6b263bdc068b630' }
+    ]
+  }
+]
