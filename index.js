@@ -181,12 +181,12 @@ app.post("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { ses
           if (!user) {
               res.status(400).send("Not able to add favorite movie");
           } else {
-              res.status(200).json.send("Favorite movie was added.");
+              res.status(200).json("Favorite movie was added.");
           }
       })
       .catch((err) => {
           console.error(err);
-          res.status(500).send("Error: " + err);
+          res.status(500).json("Error: " + err);
   });
 });
 
@@ -199,12 +199,12 @@ app.delete("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { s
           if (!user) {
               res.status(400).send(req.params.MoviesID + " was not found");
           } else {
-              res.status(200).json.send("Favorite movie was deleted.");
+              res.status(200).json("Favorite movie was deleted.");
           }
       })
       .catch((err) => {
           console.error(err);
-          res.status(500).send("Error: " + err);
+          res.status(500).json("Error: " + err);
   });
 });
 
