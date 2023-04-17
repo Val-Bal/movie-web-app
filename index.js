@@ -179,7 +179,7 @@ app.post("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { ses
 })
       .then((user) => {
           if (!user) {
-              res.status(400).send("Not able to add favorite movie");
+              res.status(400).json("Not able to add favorite movie");
           } else {
               res.status(200).json("Favorite movie was added.");
           }
@@ -197,7 +197,7 @@ app.delete("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { s
 })
       .then((user) => {
           if (!user) {
-              res.status(400).send(req.params.MoviesID + " was not found");
+              res.status(400).json(req.params.MoviesID + " was not found");
           } else {
               res.status(200).json("Favorite movie was deleted.");
           }
