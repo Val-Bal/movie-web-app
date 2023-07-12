@@ -1,3 +1,19 @@
+/**
+* root file of the myFlix back end application
+* importing packages required for the project
+* @requires express
+* @requires bodyParser
+* @requires fs
+* @requires path
+* @requires uuid
+* @requires morgan
+* @requires CORS
+* @requires ./auth
+* @requires ./passport
+* @requires mongoose
+* @requires ./models.js
+* @requires express-validator
+*/
 const express = require('express'),
 morgan = require('morgan'),
  app = express(),
@@ -33,15 +49,26 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
+/**
+* connection to online database hosted by mongoDB
+*/
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(express.static('public'));
+ //creates a txt log file, recording any requests made to the API
 app.use(morgan('common'));
 
 
 // REQUEST with MONGODB
 
-// READ (GET all users) --> OK
+/**
+* Retrieves a specific user by their Name
+* @function
+* @method GET - endpoint '/users/:Username'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - JSON object holding data of the user
+*/
 app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOne({ Username: req.params.Username })
     .then((user) => {
@@ -57,18 +84,14 @@ app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (r
     });
 });
 
-//old code
-// app.get("/users", passport.authenticate('jwt', { session: false }), function(req, res) {
-//   Users.find()
-//   .then(function (users) {
-//       res.status(201).json(users);
-//   })
-//   .catch(function (err) {
-//       console.error(err);
-//       res.status(500).send("Error: " + err);
-//   });
-// });
-
+/**
+* Retrieves a list of all movies
+* @function
+* @method GET - endpoint '/movies'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - HTTP response object with the list of movies
+*/
 app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
     .then((movies) => {
@@ -80,7 +103,14 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) 
     });
 });
 
-//READ (GET movie by title) --> 
+/**
+* Retrieves a specific movie by its' title
+* @function
+* @method GET - endpoint '/movies/:Title'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - HTTP response object with the info of one movie
+*/
 app.get("/movies/:Title", passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ Title: req.params.Title })
   .then((movie) => {
@@ -92,7 +122,14 @@ app.get("/movies/:Title", passport.authenticate('jwt', { session: false }), (req
   });
 });
 
-// READ (GET genre by name)
+/**
+* Retrieves a specific Genre by its' title
+* @function
+* @method GET - endpoint '/movies/genre/:genreName'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - HTTP response object with info of one genre
+*/
 app.get("/movies/genre/:Name", passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ 'Genre.Name': req.params.Name })
   .then((movie) => {
@@ -104,7 +141,14 @@ app.get("/movies/genre/:Name", passport.authenticate('jwt', { session: false }),
   });
 });
 
- // READ (GET director by name)
+/**
+* Retrieves a specific Director by their Name
+* @function
+* @method GET - endpoint '/movies/directors/:directorName'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - HTTP response object with info of one director
+*/
  app.get("/movies/directors/:Name", passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ 'Director.Name': req.params.Name })
   .then((director) => {
@@ -116,7 +160,14 @@ app.get("/movies/genre/:Name", passport.authenticate('jwt', { session: false }),
   });
 });
 
-// CREATE a new user
+/**
+* Allows users to register by filling out required information
+* @function
+* @method POST - endpoint '/users'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - JSON object holding data of the new user
+*/
 app.post("/users", 
 // Validation logic here for request
   //you can either use a chain of methods like .not().isEmpty()
@@ -143,6 +194,7 @@ app.post("/users",
           return res.status(400).send(req.body.Username + " already exists");
       }else {
       Users.create({
+        // req.body is data input by user, the keys (eg Email) correlate to a field in models.js
           Username: req.body.Username,
           Password: hashedPassword,
           Email: req.body.Email,
@@ -163,7 +215,14 @@ app.post("/users",
   });
 });
 
-// UPDATE user info --> 
+/**
+* Allows existing user to update their information
+* @function
+* @method PUT - endpoint '/users/:Username'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - JSON object holding updated data of the user
+*/
 app.put("/users/:Username", passport.authenticate('jwt', { session: false }), (req, res) => {
   let hashedPassword = Users.hashPassword(req.body.Password);
   Users.findOneAndUpdate(
@@ -187,8 +246,14 @@ app.put("/users/:Username", passport.authenticate('jwt', { session: false }), (r
     });
 });
 
-// CREATE movie from users favorite movies 
-// why Post when update?
+/**
+* Allows registered users to add a movie to their favorites
+* @function
+* @method POST - endpoint '/users/:Username/movies/:MovieID'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - JSON object holding updated data of the user
+*/
 app.post("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndUpdate ({ Username: req.params.Username }, {
     $push: { FavoriteMovies: req.params.MoviesID }
@@ -208,7 +273,14 @@ app.post("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { ses
   });
 });
 
-// DELETE movie from users favorite movies
+/**
+* Allows registered users to remove a movie from their favorites
+* @function
+* @method DELETE - endpoint '/users/:Username/movies/:MovieID'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - JSON object holding updated data of the user
+*/
 app.delete("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndUpdate ({ Username: req.params.Username }, {
     $pull: { FavoriteMovies: req.params.MoviesID }
@@ -228,7 +300,14 @@ app.delete("/users/:Username/movies/:MoviesID", passport.authenticate('jwt', { s
   });
 });
 
-// DELETE users
+/**
+* Allows a registered user to delete their account
+* @function
+* @method DELETE - endpoint '/users/:Username'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {string} - message confirming account deletion
+*/
 app.delete("/users/:Username", passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndRemove ({ Username: req.params.Username })
       .then((user) => {
@@ -244,11 +323,27 @@ app.delete("/users/:Username", passport.authenticate('jwt', { session: false }),
       });
 });
 
-// GET requests documentation
+// * @summary Express GET route located at the endpoint “/” that returns a default textual response
+// * @return {object} 200 - success response - application/json
+
+/**
+* Welcome page text response
+* @function
+* @method GET - endpoint '/'
+* @param {object} - HTTP request object
+* @param {object} - HTTP response object
+* @returns {object} - HTTP response object with the welcome message
+*/
 app.get('/', (req, res) => {
-  res.send('Welcome to Indiflix!');
+  res.send('Welcome to IndieFlix!');
 });
 
+/**
+* GET the API documentation at the "/documentation" endpoint
+* @function
+* @method GET - endpoint '/documentation'
+* @returns the contents of documentation.html
+*/
 app.get('/documentation', (req, res) => {                  
   res.sendFile('public/documentation.html', { root: __dirname });
 });
